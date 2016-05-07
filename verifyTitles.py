@@ -6,6 +6,9 @@ import PyMovies
 
 TITLE_FILE = "./AllMovies.txt"
 
+'''
+This checks the titles
+'''
 def checkTitles(tFile):
     with open(tFile,"r") as f:
         for movie in f:
@@ -15,8 +18,10 @@ def checkTitles(tFile):
                 title = movie[:leftPar].strip()
                 year = movie[leftPar+1:rightPar]
             elif (leftPar > 0) or (rightPar > 0):
+                print "-"*20
                 print "POTENTIAL ODD TITLE WARNING:"
                 print movie
+                print "-"*20
             else:
                 year = ""
                 period = movie.rfind(".")

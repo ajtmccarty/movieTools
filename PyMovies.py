@@ -2,6 +2,50 @@
 import requests
 import bs4
 
+class Media:
+    def __init__(self,title="",year=None,mType='',link="",actors=[]):
+        self.mDict = {}
+        self.mDict["title"] = title
+        self.mDict["year"] = year
+        self.mDict["type"] = mType
+        self.mDict["link"] = link
+        self.mDict["actors"] = actors
+
+    def addTitle(self, title):
+        self.mDict["title"] = str(title)
+        return
+
+    def addYear(self, year):
+        self.mDict["year"] = int(year)
+        return
+
+    def addType(self,mType):
+        self.mDict["type"] = mType
+        return
+
+    def addLink(self, link):
+        self.mDict["link"] = str(link)
+        return
+
+    def addActor(self, actor):
+        self.mDict["actors"].append(actor)
+        return
+
+    def getTitle(self):
+        return self.mDict["title"]
+
+    def getYear(self):
+        return self.mDict["year"]
+
+    def getType(self):
+        return self.mDict["type"]
+
+    def getLink(self):
+        return self.mDict["link"]
+
+    def getActors(self):
+        return self.mDict["actors"]
+
 def search(title, year):
     results = []
     for i in range(len(searchDict['movies'])):
@@ -28,6 +72,9 @@ def imdbGetHtml(searchString):
     return bs4.BeautifulSoup(r.text, 'html.parser')
 
 
+'''
+return a list of Movie Objects for the specified input title
+'''
 def imdbTitleSearch(title):
     bSoup = imdbGetHtml(title)
     results = []
@@ -55,11 +102,9 @@ def imdbTitleSearch(title):
             info['year'] = int(info['year'])
         else:
             info['year'] = None
+        print info
         link = 'http://www.imdb.com' + td.a.get('href')
-        results.append((info['title'],
-         info['year'],
-         info['type'],
-         link))
+        results.append(Media(info['title'],info['year'],info['type'],link))
 
     return results
 
@@ -102,14 +147,15 @@ def titleSelector(searchTerm, options):
 
 
 def getMovieActors(title, year):
+    #get list of possible Movie Objects
     optionList = imdbTitleSearch(title)
-    index = titleSelector(title + ' - ' + str(year), [ x[0] + ' - ' + str(x[1]) for x in optionList ])
-    actors = imdbGetActors(optionList[index][2])
+    #find index of correct Movie object, if it exists
+    index = titleSelector(title + ' - ' + str(year), [ m.getTitle() + ' - ' + str(m.getYear()) for m in optionList ])
+    #get the actors of the Movie object
+    actors = imdbGetActors(optionList[index].getLink())
     for actor in actors:
         print actor[0]
 
 
 if __name__ == '__main__':
-    x = allSearch('Watchmen', 2009)
-    print 'WATCHMEN STARS:'
-    print x['movies'][1]['starring']
+    getMovieActors('Watchmen', 2009)

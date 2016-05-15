@@ -2,25 +2,6 @@
 import requests
 import bs4
 
-def search(title, year):
-    results = []
-    for i in range(len(searchDict['movies'])):
-        thisMovie = searchDict['movies'][i]
-        year = thisMovie['release-date'][:4]
-        results.append((i, thisMovie['title'], year))
-
-    return results
-
-
-def allSearch(title, year):
-    url = 'https://boxofficebuz.p.mashape.com/v1/movie/search/'
-    headers = {'X-Mashape-Key': 'o2UzVbD7xMmshaVs2OmyxPeEbiCRp1V05ddjsnp1xUCip3E33e',
-     'Accept': 'application/json'}
-    r = requests.get(url + title, headers=headers)
-    searchDict = r.json()
-    return searchDict
-
-
 def imdbGetHtml(searchString):
     searchString = searchString.lower()
     searchString.replace(' ', '+')

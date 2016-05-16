@@ -20,87 +20,39 @@ def allSearch(title, year):
     searchDict = r.json()
     return searchDict
 
-
-def imdbGetHtml(searchString):
-    searchString = searchString.lower()
-    searchString.replace(' ', '+')
-    r = requests.get('http://www.imdb.com/find?ref_=nv_sr_fn&q=' + searchString + '&s=all')
-    return bs4.BeautifulSoup(r.text, 'html.parser')
-
-
 '''
-return a list of Movie Objects for the specified input title
+Utility for selecting an option from a list
+INPUT: the search term and the list of possible options
+OUTPUT: the index of the selected option or None
 '''
-def imdbTitleSearch(title):
-    bSoup = imdbGetHtml(title)
-    results = []
-    modes = ['title', 'year', 'type']
-    resultTable = bSoup.find('table', {'class': 'findList'})
-    for td in resultTable.find_all('td', {'class': 'result_text'}):
-        titleString = td.get_text().strip()
-        info = {}
-        for m in modes:
-            info[m] = ''
-
-        modeIndex = 0
-        for ch in titleString:
-            if ch == '(':
-                info[modes[modeIndex]] = info[modes[modeIndex]].strip()
-                modeIndex += 1
-                continue
-            elif ch == ')':
-                if modeIndex == len(modes) - 1:
-                    break
-                continue
-            info[modes[modeIndex]] += ch
-
-        if info['year'].isdigit():
-            info['year'] = int(info['year'])
-        else:
-            info['year'] = None
-        print info
-        link = 'http://www.imdb.com' + td.a.get('href')
-        results.append(Media(info['title'],info['year'],info['type'],link))
-
-    return results
-
-
-def imdbGetActors(titleUrl):
-    r = requests.get(titleUrl)
-    bSoup = bs4.BeautifulSoup(r.text, 'html.parser')
-    castList = bSoup.find('table', {'class': 'cast_list'})
-    results = []
-    for row in castList.find_all('td', {'itemprop': 'actor'}):
-        name = row.find('span', {'itemprop': 'name'}).string
-        link = row.a.get('href')
-        results.append((name, link))
-
-    return results
-
-
 def titleSelector(searchTerm, options):
     print 'SEARCH TERM: ' + searchTerm
     print '---POTENTIAL MATCHES---'
+    #print out all the possible matches in options with an index
     for tup in enumerate(options, 1):
         print '(' + str(tup[0]) + ') ' + tup[1]
-
+    #add an option for no good match
     print '(N) No Good Match'
     isValid = False
+    #handle user input
     while not isValid:
         selection = raw_input('Please select best match or (N) for none:').lower()
+        #must be 'n' or a number
         if selection != 'n' and not selection.isdigit():
             print 'Input must be a number or (N)'
             continue
         if selection == 'n':
             return None
+        #if it's not 'n' here, then it must be a number
         selection = int(selection)
+        #make sure it's an appropriate number
         if selection < 1 or selection > len(options):
             print 'Input must be between 1 and ' + str(len(options))
             continue
         isValid = True
 
+    #subtract 1 b/c options start at 1 but list is 0 indexed
     return selection - 1
-
 
 def getMovieActors(title, year):
     #get list of possible Movie Objects

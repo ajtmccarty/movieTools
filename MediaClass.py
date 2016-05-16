@@ -22,7 +22,7 @@ children = tree children of this Media Object, such as
            (TV episodes under a season or multi-part movies in a directory)
 '''
 class Media:
-    def __init__(self,absolutePath=""):
+    def __init__(self,absolutePath):
         self.rawTitle = ""
         self.fTitle = ""
         self.year = None
@@ -33,9 +33,8 @@ class Media:
         self.fName = ""
         self.fExt = ""
         self.children = []
-        if absolutePath:
-            self.extractFromPath(absolutePath)
-            self.extractFromFName()
+        self.extractFromPath(absolutePath)
+        self.extractFromFName()
 
     '''
     INPUT: an absolute path to a file
@@ -73,6 +72,7 @@ class Media:
         #if there is no parenthesis, we assume there is no year
         if not hasPar:
             self.fTitle = self.fName
+            return
         [title,year] = self.fName.rsplit("(")
         #check if year is 4 digits followed by a parenthesis
         if re.match("[0-9]{4}\)",year):

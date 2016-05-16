@@ -1,24 +1,13 @@
 #!/usr/bin/python
+import sys
+import os
+from MediaClass import Media
 import requests
 import bs4
+import logging
 
-def search(title, year):
-    results = []
-    for i in range(len(searchDict['movies'])):
-        thisMovie = searchDict['movies'][i]
-        year = thisMovie['release-date'][:4]
-        results.append((i, thisMovie['title'], year))
-
-    return results
-
-
-def allSearch(title, year):
-    url = 'https://boxofficebuz.p.mashape.com/v1/movie/search/'
-    headers = {'X-Mashape-Key': 'o2UzVbD7xMmshaVs2OmyxPeEbiCRp1V05ddjsnp1xUCip3E33e',
-     'Accept': 'application/json'}
-    r = requests.get(url + title, headers=headers)
-    searchDict = r.json()
-    return searchDict
+#Default directory of movies
+MOVIE_DIRECTORY = '/mnt2/Media/Movies'
 
 '''
 Utility for selecting an option from a list
@@ -54,6 +43,26 @@ def titleSelector(searchTerm, options):
     #subtract 1 b/c options start at 1 but list is 0 indexed
     return selection - 1
 
+'''
+INPUT: Directory containing names and directories of the Movies
+OUTPUT: a list of MediaClass.Media objects holding the absolute path to the file
+        and the name of the file with no extension
+'''
+def scanDirectory(directory):
+    rawMedia = []
+    try:
+        result = os.walk(directory)
+    except OSError:
+        sys.stderr.write('Invalid target directory: '+directory+'\n')
+        sys.stderr.write('Either doesn\'t exist or cannot access \n')
+        sys.stderr.write('Quitting...\n')
+        sys.exit(0)
+    (dirpath,dirnames,files) = next(result)
+    for thisFile in files:
+        thisObject = Media(dirpath+"/"+thisFile)
+        rawMedia.append(thisObject)
+    return rawMedia
+
 def getMovieActors(title, year):
     #get list of possible Movie Objects
     optionList = imdbTitleSearch(title)
@@ -64,6 +73,15 @@ def getMovieActors(title, year):
     for actor in actors:
         print actor[0]
 
+def readCommand(argv):
+    if len(argv) > 1:
+        directory = argv[1]
+    else:
+        directory = MOVIE_DIRECTORY
+    mediaList = scanDirectory(directory)
+    for m in mediaList:
+        print m.getFTitle()
 
 if __name__ == '__main__':
-    getMovieActors('Watchmen', 2009)
+    logging.basicConfig(filename='PyMovies.log',format='%(asctime)s %(message)s')
+    readCommand(sys.argv)

@@ -16,7 +16,11 @@ def imdbGetHtml(searchString):
 
 '''
 INPUT: title string to search on imdb.com
-OUTPUT: list of Media objects returned by the search
+OUTPUT: list of dictionaries of the following form scraped from imdb:
+            title: title
+            year: release year
+            type: TV Show, Videogame, etc. Blank for films
+            link: URL to imdb page
 '''
 def imdbTitleSearch(title):
     #get the BeautifulSoup4 for the title
@@ -61,9 +65,9 @@ def imdbTitleSearch(title):
             logging.warning("title input to function was %s",title)
             logging.warning("parsing title from imdb was %s",titleString)
             info['year'] = None
-        link = 'http://www.imdb.com' + td.a.get('href')
+        info['link'] = 'http://www.imdb.com' + td.a.get('href')
         #creates a Media object and adds it to the results list
-        results.append(Media(info['title'],info['year'],info['type'],link))
+        results.append(info)
     return results
 
 '''
@@ -83,5 +87,4 @@ def imdbGetActors(titleUrl):
     return results
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='movieTools.log',format='%(asctime)s %(message)s')
     getMovieActors('Watchmen', 2009)

@@ -11,15 +11,15 @@ link = url to imdb page for media
 actors = list of actors
 '''
 class Media:
-    def __init__(self,path,rawName="",title="",year=None,mType='',link="",actors=[]):
+    def __init__(self,title="",year=None,mType="",link="",actors=[]):
         self.mDict = {}
-        self.mDict["path"] = path
-        self.mDict["rawName"] = rawName
         self.mDict["title"] = title
         self.mDict["year"] = year
         self.mDict["type"] = mType
         self.mDict["link"] = link
         self.mDict["actors"] = actors
+        self.mDict["path"] = ""
+        self.mDict["rawName"] = ""
 
     def addPath(self,newPath):
         self.mDict["path"] = newPath

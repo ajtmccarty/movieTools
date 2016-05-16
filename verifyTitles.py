@@ -2,6 +2,7 @@
 
 import os
 import sys
+from MediaClass import Media
 #import re
 #import PyMovies
 
